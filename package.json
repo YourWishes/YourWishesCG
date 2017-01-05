@@ -1,0 +1,35 @@
+{
+    "name": "yourwishescg",
+    "version": "1.0.0",
+    "description": "NodeCG for my stream.",
+    "main": "index.js",
+    "scripts": {
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/YourWishes/YourWishesCG.git"
+    },
+    "author": {
+        "name": "Dominic Masters",
+        "email": "dominic@domsplace.com",
+        "url": "http://domsplace.com"
+    },
+    "nodecg": {
+        "compatibleRange": "~0.8.0",
+        "bundleDependencies": {
+        },
+        "graphics": [
+        ],
+        "soundCues": [
+        ],        
+        "dashboardPanels": [
+        ]
+    },
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/YourWishes/YourWishesCG/issues"
+    },
+    "homepage": "https://github.com/YourWishes/YourWishesCG#readme",
+    "devDependencies": {
+    }
+}
