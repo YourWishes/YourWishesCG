@@ -39,3 +39,5 @@ jspm_packages
 # Fonts
 graphics/fonts
 graphics/images
+graphics/sounds
+bower_components

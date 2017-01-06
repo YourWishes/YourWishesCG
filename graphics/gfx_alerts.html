@@ -5,7 +5,7 @@
         <link href="fonts/ChronoType/webfont.css" rel="stylesheet">
 
         <style>
-            * {box-sizing: border-box;font-family: "ChronoType";font-size: 36px;}
+            * {box-sizing: border-box;font-family: "5x5 Pixel";font-size: 36px;}
             body {margin: 0;}
             
             .alert-container {
@@ -35,7 +35,7 @@
                 position: absolute;
                 width: 4px;
                 height: 4px;
-                background: #B3B4EF;
+                background: orange;
                 animation-name: alert-box-scroller-anim;
                 animation-duration: 1s;
                 animation-iteration-count: 1;
@@ -45,7 +45,7 @@
             }
             
             .alert-box-border {
-                background: #586EB5;
+                background: #5282C3;
                 position: absolute;
                 z-index: 5;
                 animation-duration: 0.25s;
@@ -73,12 +73,20 @@
             
             .alert-title {
                 position: absolute;
-                font-size: 60px;
                 padding: 4px;
                 top: 50%;
-                transform: translateY(-40%);
-                left: 115px;
-                line-height: 0.5em;
+                transform: translateY(-50%);
+                left: 96px;
+                font-size: 35px;
+            }
+            
+            .alert-title > .title {
+                line-height: 0.9em;
+            }
+            .alert-title > .subtitle {
+                line-height: 0.9em;
+                font-size: 18px;
+                font-family: pixelmix;
             }
             
             .alert-inner-body {
@@ -135,15 +143,16 @@
                     left: 100%;
                     transform: translate(-100%, 0);
                 }
-                99% {background: #B3B4EF;}
+                99% {background: orange;}
                 100% {
-                    background: #586EB5;
+                    background: orange;
                     top: 0%;
                     left: 0%;
                     transform: translate(0, 0);
                 }
             }
         </style>
+        <script src="app/common.js"></script>
     </head>
     <body>
         <div class="alert-container">

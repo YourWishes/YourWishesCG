@@ -29,10 +29,17 @@
         ],
         "dashboardPanels": [
             {
+                "name": "yw-twitch-status",
+                "title": "Twitch Status",
+                "width": 2,
+                "headerColor": "#6441A4",
+                "file": "dash_twitch_status.html"
+            },
+            {
                 "name": "yw-alerts",
                 "title": "Stream Alerts",
                 "width": 3,
-                "headerColor": "#6441A4",
+                "headerColor": "#87cefa",
                 "file": "dash_alerts.html"
             }
         ]
@@ -43,5 +50,6 @@
     },
     "homepage": "https://github.com/YourWishes/YourWishesCG#readme",
     "devDependencies": {
+        "request": "2.79.0"
     }
 }

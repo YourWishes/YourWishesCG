@@ -5,16 +5,10 @@
     let currentAlert = undefined;
     
     nodecg.listenFor('ywShowAlert', function(value) {
-        var title = "Test Title<br />second line";
-        var image = "images/twitter.png";
-        var life = 5000;
+        var obj = value;
+        obj.id = nextAlertID++;
         
-        alertQueue.push({
-            id: nextAlertID++,
-            title: title,
-            image: image,
-            life: life
-        });
+        alertQueue.push(obj);
     });
     
     setInterval(() => {
@@ -31,7 +25,7 @@
         
         //Check the styles.
         var width = 550;
-        var height = 100;
+        var height = 80;
         var life = 4000;
         
         if(alert.life) life = alert.life;
@@ -39,6 +33,11 @@
         var boxPos = "left: 8px;bottom: 8px;";
         var alertWidth = width+(4*2);
         var alertHeight = height+(4*2);
+        
+        var title = alert.title;
+        //I'm parsing this cuz the font I use doesn't have symbols...
+        title = title.replace(/[^\w\s]/g,'');
+        title = title.replace(' ', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');//My font had a weird spacing thing going on.
         
         var x = '<div class="alert-box" style="'+boxPos+';width:'+alertWidth+'px;height:'+alertHeight+'px;" id="alert-box-'+alert.id+'">';
         x += '<div class="alert-box-inner">';
@@ -49,20 +48,44 @@
         x += '<div class="alert-box-border right"></div>';
         x += '<div class="alert-box-border top"></div>';
         x += '<div class="alert-box-body" style="width:'+width+'px;height:'+height+'px;">';
-        x += '<div class="alert-image"><img src="'+alert.image+'" /></div>';
-        x += '<div class="alert-title">'+alert.title+'</div>';
+        if(alert.image) x += '<div class="alert-image"><img src="'+alert.image+'" /></div>';
+        x += '<div class="alert-title">';
+        x += '<div class="title">'+title+'</div>';
+        if(alert.subtitle) x += '<div class="subtitle">'+alert.subtitle+'</div>';
+        x += '</div>';
         x += '</div>';
         
         x += '</div>';
+        
+        if(alert.sound && (!getQueryVariable("sound") || getQueryVariable("sound") != "false")) {
+            console.log("Sound Found");
+            var ext = 'audio/';
+            if(alert.sound.endsWith(".mp3")) {
+                ext += 'mp3';
+            } else if(alert.sound.endsWith(".wav")) {
+                ext += 'wav';
+            } else if(alert.sound.endsWith(".ogg")) {
+                ext += 'ogg';
+            }
+            x += '<audio autoplay id="alert-sound-'+alert.id+'"><source src="'+alert.sound+'" type="'+ext+'"></audio>';
+        }
+        
         x += '</div>';
         
         container.innerHTML = x;
+        
+        if(alert.volume) {
+            let alertSoundElement = document.getElementById("alert-sound-"+alert.id);
+            if(alertSoundElement) {
+                alertSoundElement.volume = alert.volume;
+            }
+        }
         
         //Now we need to set the "Hide the alert" timer
         setTimeout(function() {
             //Get the currently queued item
             let alertElement = document.getElementById("alert-box-"+currentAlert.id);
-            alertElement.className += " hidden";//Hides it
+            alertElement.addClass("hidden");//Hides it
             
             //Now another timeout (This is to say "Yes the queue is clear")
             setTimeout(function() {

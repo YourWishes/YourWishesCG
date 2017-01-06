@@ -2,20 +2,23 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <script src="components/webcomponentsjs/webcomponents-lite.min.js"></script>
         
-        <style type="text/css">
-            .panel-alerts {margin: 0;padding: 0;}
-            
-            * {
-                font-family: Arial, Helvetica, sans-serif;
-                font-size: 12px;
-                box-sizing: border-box;
-            }
-        </style>
+        <link rel="import" href="components/paper-button/paper-button.html">
+        <link rel="import" href="components/paper-input/paper-input.html">
+        <link rel="import" href="components/paper-slider/paper-slider.html">
     </head>
     
-    <body class="panel-alerts">
-        <button type="button" id="btnTest">TEST ALERT</button>
+    <body>
+        <paper-input label="Alert Title" always-float-label value="Hello World" id="inpAlertTitle"></paper-input>
+        <paper-input label="Alert Subtitle" always-float-label value="" id="inpAlertSubtitle"></paper-input>
+        <paper-input label="Alert Duration" always-float-label value="4000" id="inpAlertDuration"></paper-input>
+        <paper-input label="Image URL (Optional)" always-float-label value="images/twitter.png" id="inpAlertImage"></paper-input>
+        <paper-input label="Sound URL (Optional)" always-float-label value="sounds/quack.wav" id="inpAlertSound"></paper-input>
+        <div>Sound Volume</div>
+        <paper-slider max="100" style="width:100%;"  value="50" id="inpAlertVolume"></paper-slider>
+        <paper-button raised style="width:100%;" id="btnShowAlert">Show Alert</paper-button>
+        
         <script type="text/javascript" src="dash_alerts.js"></script>
     </body>
 </html>
