@@ -19,10 +19,22 @@
         "bundleDependencies": {
         },
         "graphics": [
+            {
+                "file": "gfx_alerts.html",
+                "width": 1920,
+                "height": 1080
+            }
         ],
         "soundCues": [
-        ],        
+        ],
         "dashboardPanels": [
+            {
+                "name": "yw-alerts",
+                "title": "Stream Alerts",
+                "width": 3,
+                "headerColor": "#6441A4",
+                "file": "dash_alerts.html"
+            }
         ]
     },
     "license": "Apache-2.0",
