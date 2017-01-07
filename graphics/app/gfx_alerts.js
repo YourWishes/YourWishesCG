@@ -37,7 +37,7 @@
         var title = alert.title;
         //I'm parsing this cuz the font I use doesn't have symbols...
         title = title.replace(/[^\w\s]/g,'');
-        title = title.replace(' ', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');//My font had a weird spacing thing going on.
+        title = title.replace(' ', '&nbsp;&nbsp;&nbsp;&nbsp;');//My font had a weird spacing thing going on.
         
         var x = '<div class="alert-box" style="'+boxPos+';width:'+alertWidth+'px;height:'+alertHeight+'px;" id="alert-box-'+alert.id+'">';
         x += '<div class="alert-box-inner">';

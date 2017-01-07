@@ -30,6 +30,7 @@ module.exports = function (nodecg,app) {
     //Replicants
     const twitch_auth_test = nodecg.Replicant('yw_twitch_auth_test', {defaultValue: null, persistant: true});
     const twitch_auth = nodecg.Replicant('yw_twitch_auth', {defaultValue: null, persistant: false});
+    const yw_past_alerts = nodecg.Replicant('yw_past_alerts');
     
     //Replicant Handlers
     twitch_auth_test.on('change', (repl) => {
@@ -89,13 +90,16 @@ module.exports = function (nodecg,app) {
                 fs.writeFile('./db/twitch/followers/'+followObj.user.name+'.json', JSON.stringify(followObj));
                 console.log("Welcome new Twitch follower " + followObj.user.display_name);
                 
-                nodecg.sendMessage('ywShowAlert', {
+                var obj = {
                     title: "New Follower!",
                     subtitle: "Welcome " + followObj.user.display_name + "!",
                     sound: "sounds/ok_lets_do_this.wav",
                     image: "images/heart_animated.gif",
                     life: 10000
-                });
+                };
+                
+                yw_past_alerts.value.push(obj);
+                nodecg.sendMessage('ywShowAlert', obj);
             }
         });
     }, 10000);

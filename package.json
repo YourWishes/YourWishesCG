@@ -41,6 +41,13 @@
                 "width": 3,
                 "headerColor": "#87cefa",
                 "file": "dash_alerts.html"
+            },
+            {
+                "name": "yw-past-alerts",
+                "title": "Past Alerts",
+                "width": 3,
+                "headerColor": "#ff69b4",
+                "file": "dash_past_alerts.html"
             }
         ]
     },
