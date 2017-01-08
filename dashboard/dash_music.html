@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        
+        <style type="text/css">
+            .panel-music {margin: 0;padding:2px;}
+            * {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 12px;
+                box-sizing: border-box;
+            }
+            
+            .now-playing {
+                width: 100%;
+            }
+            
+            .title {font-size: 16px;}
+            
+            .song-queue {
+                width: 100%;
+                height: 250px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                border: 1px solid #333;
+                padding: 2px;
+            }
+            
+            .song-queue > .song {
+                border: 1px solid #666;
+                padding: 2px;
+                margin-bottom: 6px;
+            }
+            
+            .controls {font-size: 0; position: relative;}
+            .controls > button {width: 23%; margin: 1%; display: inline-block;}
+            .controls > input[type="range"] {
+                display: block;
+                width: 98%;
+            }
+            
+            .youtube-downloader {}
+            .youtube-downloader > input, .youtube-downloader > button {width: 100%;display: block; margin: 8px auto;}
+            
+            .btnSmall {
+                padding: 0;
+                margin: 0;
+                font-size: 6px;
+            }
+        </style>
+    </head>
+    
+    <body class="panel-music">
+        <input type="text" disabled value="" class="now-playing" id="txtNowPlaying" />
+        <div class="title">Songs Queue</div>
+        <div class="song-queue" id="song-queue">
+            <div class="song">Yes</div>
+        </div>
+        
+        <div class="controls">
+            <button type="button" id="btnPlayPause">Pause</button>
+            <button type="button" id="btnNextSong">Next Song</button>
+            <button type="button" id="btnClearList">Clear List</button>
+            <input type="range" min="1" max="100" value="10" id="slideVolume" />
+        </div>
+        
+        <div class="title">Download/Queue Song</div>
+        <div class="youtube-downloader ">
+            <input type="text" placeholder="Youtube URL or ID" id="txtYoutube" />
+            <input type="text" placeholder="Song Title" id="txtSongTitle" />
+            <input type="text" placeholder="Song Artist (Optional)" id="txtSongArtist" />
+            <button type="button" id="btnDownloadSong">Download & Queue</button>
+        </div>
+        
+        <script type="text/javascript" src="dash_music.js"></script>
+    </body>
+</html>

@@ -102,7 +102,7 @@ module.exports = function (nodecg,app) {
                 nodecg.sendMessage('ywShowAlert', obj);
             }
         });
-    }, 10000);
+    }, 30000);
     
     //Setup
     if(!fs.existsSync('./db')) {

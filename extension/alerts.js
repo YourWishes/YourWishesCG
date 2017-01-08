@@ -3,9 +3,4 @@
 module.exports = function (nodecg,app) {
     //Replicants
     const yw_past_alerts = nodecg.Replicant('yw_past_alerts', {defaultValue: [], persistant: true});
-    
-    //Events
-    yw_past_alerts.on('change', (newval) => {
-        console.log("New Alert!");
-    });
 };

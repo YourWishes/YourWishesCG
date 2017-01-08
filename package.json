@@ -48,6 +48,13 @@
                 "width": 3,
                 "headerColor": "#ff69b4",
                 "file": "dash_past_alerts.html"
+            },
+            {
+                "name": "yw-music-player",
+                "title": "Music Player",
+                "width": 3,
+                "headerColor": "#F27D0C",
+                "file": "dash_music.html"
             }
         ]
     },
@@ -57,6 +64,8 @@
     },
     "homepage": "https://github.com/YourWishes/YourWishesCG#readme",
     "devDependencies": {
-        "request": "2.79.0"
+        "request": "^2.79.0",
+        "ytdl-core": "^0.7.21",
+        "fluent-ffmpeg": "^1.5.2"
     }
 }
