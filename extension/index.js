@@ -6,6 +6,7 @@ const fs = require('fs');
 module.exports = function (extensionApi) {
     nodecg = extensionApi;
     
+    nodecg.getQueryVariable = function(name, url) {
         name = name.replace(/[\[\]]/g, "\\$&");
         var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
             results = regex.exec(url);
