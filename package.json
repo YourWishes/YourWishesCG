@@ -66,6 +66,8 @@
     "devDependencies": {
         "request": "^2.79.0",
         "ytdl-core": "^0.7.21",
-        "fluent-ffmpeg": "^1.5.2"
+        "fluent-ffmpeg": "^1.5.2",
+        "irc": "^1.1.2",
+        "youtube-api": "^2.0.6"
     }
 }

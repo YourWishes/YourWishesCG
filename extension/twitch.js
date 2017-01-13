@@ -4,6 +4,8 @@ module.exports = function (nodecg,app) {
     //Imports
     let request = require('request');
     let fs = require('fs');
+    let nodeIRC = require('node-irc');
+    let tmi = require('tmi.js');
     
     //Functions
     let twitchGET = function(token, method, callback) {
@@ -31,6 +33,7 @@ module.exports = function (nodecg,app) {
     const twitch_auth_test = nodecg.Replicant('yw_twitch_auth_test', {defaultValue: null, persistant: true});
     const twitch_auth = nodecg.Replicant('yw_twitch_auth', {defaultValue: null, persistant: false});
     const yw_past_alerts = nodecg.Replicant('yw_past_alerts');
+    let chatClient = undefined;
     
     //Replicant Handlers
     twitch_auth_test.on('change', (repl) => {
@@ -43,6 +46,56 @@ module.exports = function (nodecg,app) {
                     
                     if(bd && bd.token && bd.token.valid) {
                         twitch_auth.value = twitch_auth_test.value;
+                        
+                        if(chatClient && chatClient.readyState() == "OPEN") chatClient.disconnect();
+                        
+                        if(nodecg.bundleConfig.twitch.bot.channel) {
+                            console.log("Connecting to Twitch Chat...");
+                            //Chat stuff
+                            var options = {
+                                options: {
+                                    debug: false
+                                },
+                                connection: {
+                                    reconnect: true
+                                },
+                                identity: {
+                                    username: bd.token.user_name,
+                                    password: "oauth:"+twitch_auth_test.value
+                                },
+                                channels: ["#"+nodecg.bundleConfig.twitch.bot.channel]
+                            };
+
+                            chatClient = new tmi.client(options);
+
+                            // Connect the client to the server..
+                            chatClient.connect();
+                            chatClient.on("connected", function (address, port) {
+                                console.log("Successfully connected to Twitch Chat!");
+                                if(nodecg.bundleConfig.twitch.bot.messages && nodecg.bundleConfig.twitch.bot.messages.join) chatClient.say(nodecg.bundleConfig.twitch.bot.channel, nodecg.bundleConfig.twitch.bot.messages.join);
+                            });
+                            chatClient.on("message", function (channel, userstate, message, self) {
+                                // Don't listen to my own messages..
+                                if (self || !userstate || !userstate["display-name"]) return;
+
+                                // Handle different message types..
+                                switch(userstate["message-type"]) {
+                                    case "action":
+                                        // This is an action message..
+                                        break;
+                                    case "chat":
+                                        nodecg.ywHandleChat({type:"twitch",handle:chatClient}, channel, message, userstate["display-name"]);
+                                        break;
+                                    case "whisper":
+                                        // This is a whisper..
+                                        break;
+                                    default:
+                                        // Something else ?
+                                        break;
+                                }
+                            });
+                        }
+                        
                         return;
                     }
                 }
@@ -77,7 +130,7 @@ module.exports = function (nodecg,app) {
         //Check the people following, any new followers we can make alerts for.
         if(!twitch_auth.value) return;//TwitchAPI not available.
         //https://api.twitch.tv/kraken/channels/test_user1/follows
-        twitchGET(twitch_auth.value, '/channels/YourWishes/follows', function(err,resp,body) {
+        twitchGET(twitch_auth.value, '/channels/'+nodecg.bundleConfig.twitch.bot.channel+'/follows', function(err,resp,body) {
             if(err) return;
             let follows = JSON.parse(body);
             if(!follows) return;
@@ -102,7 +155,7 @@ module.exports = function (nodecg,app) {
                 nodecg.sendMessage('ywShowAlert', obj);
             }
         });
-    }, 30000);
+    }, 5000);
     
     //Setup
     if(!fs.existsSync('./db')) {
@@ -114,4 +167,5 @@ module.exports = function (nodecg,app) {
     if (!fs.existsSync('./db/twitch/followers')){
         fs.mkdirSync('./db/twitch/followers');
     }
+    
 };

@@ -33,7 +33,7 @@
     
     //General Functions
     function getTwitchAuthTokenURL(client_id, redirect_uri, scope) {
-        if(typeof scope === typeof undefined) scope = 'channel_editor';
+        if(typeof scope === typeof undefined) scope = 'channel_editor chat_login';
         let x = 'https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=';
         x += encodeURIComponent(client_id);
         x += '&redirect_uri='+encodeURIComponent(redirect_uri);

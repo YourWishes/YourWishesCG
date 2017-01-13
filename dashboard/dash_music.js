@@ -7,6 +7,7 @@
     const playingState = nodecg.Replicant('yw_playing_state');
     const playingPosition = nodecg.Replicant('yw_playing_position');
     const songVolume = nodecg.Replicant('yw_song_volume');
+    const preExistingSongs = nodecg.Replicant('yw_previous_songs');
     
     //Elements
     let divSongQueue = document.getElementById("song-queue");
@@ -15,6 +16,7 @@
     let btnNextSong = document.getElementById("btnNextSong");
     let btnClearList = document.getElementById("btnClearList");
     let txtNowPlaying = document.getElementById("txtNowPlaying");
+    let divExistingSongQueue = document.getElementById("existing-song-queue");
     
     let txtYoutube = document.getElementById("txtYoutube");
     let txtSongTitle = document.getElementById("txtSongTitle");
@@ -70,6 +72,32 @@
         }
     });
     
+    preExistingSongs.on('change', function(newval) {
+        let x = '';
+        
+        if(newval && newval.length > 0) {
+            for(var i = 0; i < newval.length; i++) {
+                let song = newval[i];
+                x += '<div class="song">';
+                x += '<button type="button" class="btnPlaySong btnSmall" style="float:right" data-index="'+i+'">+</button>';
+                x += song.name;
+                if(song.artist) x += " - " + song.artist;
+                x += '</div>';
+            }
+        }
+        
+        divExistingSongQueue.innerHTML = x;
+        
+        let els = document.getElementsByClassName("btnPlaySong");
+        for(var i = 0; i < els.length; i++) {
+            els[i].addEventListener('click', function() {
+                var index = parseInt(this.getAttribute("data-index"));
+                let arr = preExistingSongs.value[index];
+                songQueue.value.push(arr);
+            });
+        }
+    });
+    
     //Handlers
     btnPlayPause.addEventListener('click', () => {
         if(playingState.value == "PLAY") {
@@ -97,15 +125,18 @@
     
     btnDownloadSong.addEventListener('click', () => {
         if(!txtYoutube.value) alert("Missing YouTube ID");
-        if(!txtSongTitle.value) alert("Missing Song Title");
         
         var obj = {
-            id: txtYoutube.value,
-            name: txtSongTitle.value
+            id: txtYoutube.value
         };
         
+        if(txtSongTitle.value && txtSongTitle.value.length > 0) obj.name = txtSongTitle.value;
         if(txtSongArtist.value && txtSongArtist.value.length > 0) obj.artist = txtSongArtist.value;
         nodecg.sendMessage('ywDownloadYTSong', obj);
+        
+        txtSongTitle.value = "";
+        txtSongArtist.value = "";
+        txtYoutube.value = "";
     });
     
     divVolumeSlider.onchange = function() {

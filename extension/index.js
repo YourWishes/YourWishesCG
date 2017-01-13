@@ -20,8 +20,10 @@ module.exports = function (extensionApi) {
     }
     
     require('./twitch.js')(nodecg,app);
+    require('./youtube.js')(nodecg,app);
     require('./music.js')(nodecg,app);
     require('./alerts.js')(nodecg,app);
+    require('./bot.js')(nodecg,app);
     
     nodecg.mount(app);
 };

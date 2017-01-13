@@ -16,6 +16,7 @@ module.exports = function (nodecg,app) {
     const playingState = nodecg.Replicant('yw_playing_state', {defaultValue: "PAUSE", persistant: true});
     const playingPosition = nodecg.Replicant('yw_playing_position', {persistant: true});
     const songVolume = nodecg.Replicant('yw_song_volume', {defaultValue: 0.1, persistant: true});
+    const preExistingSongs = nodecg.Replicant('yw_previous_songs', {defaultValue: [], persistant: false});
     
     //Functions
     let alertSong = function(song) {
@@ -29,15 +30,32 @@ module.exports = function (nodecg,app) {
         nodecg.sendMessage('ywShowAlert', obj);
     }
     
+    let refreshPreloadedSongs = function() {
+        console.log("Refreshing Preloaded songs")
+        let dir = './bundles/yourwishescg/graphics/songs/';
+        let results = fs.readdirSync(dir);
+        let existingSongs = [];
+        for(var i = 0; i < results.length; i++) {
+            var d = dir + results[i];
+            var json = d + '/info.json';
+            if(!fs.existsSync(json)) continue;
+            let x = JSON.parse(fs.readFileSync(json));
+            existingSongs.push(x);
+        }
+        preExistingSongs.value = existingSongs;
+    };
+    
+    refreshPreloadedSongs();
+    
+    //Listeners
     nowPlaying.on('change', function(newval, oldval) {
         if(newval && oldval && newval.name == oldval.name) return;
         alertSong(newval);
         if(newval) console.log("Now Playing: " + newval.name)
     });
-    
-    //Listeners
+
     nodecg.listenFor('ywDownloadYTSong', function(value) {
-        if(!value || !value.id  || !value.name) return;
+        if(!value || !value.id) return;
         
         let id = value.id;
         if(id.startsWith("http") || id.startsWith("www")) {
@@ -47,10 +65,21 @@ module.exports = function (nodecg,app) {
         let dir = './bundles/yourwishescg/graphics/songs/'+id+'/';
         if(!fs.existsSync(dir)) fs.mkdirSync(dir);
         
+        
         let url = 'https://www.youtube.com/watch?v='+id;
         let audioOutput = dir+'audio.mp4';
         let infoOutput = dir+'info.json';
         value.file = 'songs/'+id+'/audio.mp3';
+        
+        let redownload = false
+        if(!redownload && fs.existsSync(dir+'audio.mp3') && fs.existsSync(infoOutput)) {
+            let x = JSON.parse(fs.readFileSync(infoOutput));
+            songQueue.value.push(x);
+            console.log("Song already exists, queuing " + infoOutput.name);
+            return;
+        }
+        
+        if(!value.name) return;
         
         if(fs.existsSync(audioOutput)) fs.unlinkSync(audioOutput);
         if(fs.existsSync(infoOutput)) fs.unlinkSync(infoOutput);
