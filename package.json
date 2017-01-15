@@ -36,6 +36,13 @@
                 "file": "dash_twitch_status.html"
             },
             {
+                "name": "yw-youtube",
+                "title": "YouTube",
+                "width": 2,
+                "headerColor": "#e52d27",
+                "file": "dash_youtube.html"
+            },
+            {
                 "name": "yw-alerts",
                 "title": "Stream Alerts",
                 "width": 3,

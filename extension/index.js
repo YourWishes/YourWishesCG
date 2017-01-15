@@ -15,6 +15,24 @@ module.exports = function (extensionApi) {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
     
+    if (typeof String.prototype.replaceAll === typeof undefined) {
+        String.prototype.replaceAll = function (search, replacement) {
+            var target = this;
+            return target.replace(new RegExp(search, 'g'), replacement);
+        };
+    }
+    
+    nodecg.cloneObject = function(obj) {
+        let cloned = {};
+        let keys = Object.keys(obj);
+        let i = keys.length;
+        while(i--) {
+            cloned[keys[i]] = obj[keys[i]];
+        }
+        return cloned;
+    };
+    
+    
     if (!fs.existsSync('./yourwishescg')){
         fs.mkdirSync('./yourwishescg');
     }

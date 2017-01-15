@@ -68,6 +68,8 @@ module.exports = function (nodecg,app) {
         //Now we have the response we need to route it to the appropriate location
         if(scope.type == "twitch") {
             scope.handle.say(nodecg.bundleConfig.twitch.bot.channel, response);
+        } else if(scope.type == "youtube") {
+            nodecg.ywYouTubeMessage(response);
         }
     }
 };

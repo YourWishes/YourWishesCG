@@ -84,7 +84,7 @@ module.exports = function (nodecg,app) {
                                         // This is an action message..
                                         break;
                                     case "chat":
-                                        nodecg.ywHandleChat({type:"twitch",handle:chatClient}, channel, message, userstate["display-name"]);
+                                        nodecg.ywHandleChat({type:"twitch",handle:chatClient,userstate:userstate}, channel, message, userstate["display-name"]);
                                         break;
                                     case "whisper":
                                         // This is a whisper..
@@ -129,7 +129,6 @@ module.exports = function (nodecg,app) {
     setInterval(() => {
         //Check the people following, any new followers we can make alerts for.
         if(!twitch_auth.value) return;//TwitchAPI not available.
-        //https://api.twitch.tv/kraken/channels/test_user1/follows
         twitchGET(twitch_auth.value, '/channels/'+nodecg.bundleConfig.twitch.bot.channel+'/follows', function(err,resp,body) {
             if(err) return;
             let follows = JSON.parse(body);
@@ -139,20 +138,34 @@ module.exports = function (nodecg,app) {
             
             for(var i = 0; i < follows.follows.length; i++) {
                 var followObj = follows.follows[i];
-                if(fs.existsSync('./db/twitch/followers/'+followObj.user.name+'.json')) continue;
-                fs.writeFile('./db/twitch/followers/'+followObj.user.name+'.json', JSON.stringify(followObj));
+                if(fs.existsSync('./db/twitch/'+nodecg.bundleConfig.twitch.bot.channel+'/followers/'+followObj.user.name+'.json')) continue;
+                fs.writeFile('./db/twitch/'+nodecg.bundleConfig.twitch.bot.channel+'/followers/'+followObj.user.name+'.json', JSON.stringify(followObj));
                 console.log("Welcome new Twitch follower " + followObj.user.display_name);
                 
-                var obj = {
-                    title: "New Follower!",
-                    subtitle: "Welcome " + followObj.user.display_name + "!",
-                    sound: "sounds/ok_lets_do_this.wav",
-                    image: "images/heart_animated.gif",
-                    life: 10000
-                };
+                if(nodecg.bundleConfig.twitch.alerts && nodecg.bundleConfig.twitch.alerts.follow) {
+                    let obj = nodecg.bundleConfig.twitch.alerts.follow;
+                    obj = nodecg.cloneObject(obj);
+                    
+                    if(!obj.title) {
+                        obj.title = "New Follower!";
+                    } else {
+                        let x = obj.title;
+                        obj.title = x.replaceAll("{name}", followObj.user.display_name);
+                    }
+                    
+                    if(obj.subtitle) {
+                        let x = obj.subtitle
+                        obj.subtitle = x.replaceAll("{name}", followObj.user.display_name);
+                    }
+                    
+                    yw_past_alerts.value.push(obj);
+                    nodecg.sendMessage('ywShowAlert', obj);
+                }
                 
-                yw_past_alerts.value.push(obj);
-                nodecg.sendMessage('ywShowAlert', obj);
+                
+                if(nodecg.bundleConfig.twitch.bot && nodecg.bundleConfig.twitch.bot.messages && nodecg.bundleConfig.twitch.bot.messages.follow) {
+                    chatClient.say(nodecg.bundleConfig.twitch.bot.channel, nodecg.bundleConfig.twitch.bot.messages.follow.replaceAll("{name}", followObj.user.display_name));
+                }
             }
         });
     }, 5000);
@@ -164,8 +177,12 @@ module.exports = function (nodecg,app) {
     if (!fs.existsSync('./db/twitch')){
         fs.mkdirSync('./db/twitch');
     }
-    if (!fs.existsSync('./db/twitch/followers')){
-        fs.mkdirSync('./db/twitch/followers');
+    
+    if(!fs.existsSync('./db/twitch/'+nodecg.bundleConfig.twitch.bot.channel+'/')) {
+        fs.mkdirSync('./db/twitch/'+nodecg.bundleConfig.twitch.bot.channel+'/');
     }
     
+    if (!fs.existsSync('./db/twitch/'+nodecg.bundleConfig.twitch.bot.channel+'/followers')){
+        fs.mkdirSync('./db/twitch/'+nodecg.bundleConfig.twitch.bot.channel+'/followers');
+    }
 };
