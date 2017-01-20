@@ -1,9 +1,6 @@
 (function () {
     'use strict';
     
-    //Replicants
-    const yw_past_alerts = nodecg.Replicant('yw_past_alerts');
-    
     //Elements
     let btnShowAlert = document.getElementById("btnShowAlert");
     let inpAlertTitle = document.getElementById("inpAlertTitle");
@@ -33,7 +30,6 @@
         let alertVolume = parseInt(inpAlertVolume.value);
         if(alertVolume) obj.volume = alertVolume/100.0;
         
-        nodecg.sendMessage('ywShowAlert', obj);
-        yw_past_alerts.value.push(obj);
+        nodecg.sendMessage('QueueSimpleAlert', obj);
     });
 })();

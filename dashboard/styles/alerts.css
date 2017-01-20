@@ -1,0 +1,22 @@
+.prev-alert {
+    margin: 2px;
+    border: 1px solid #ddd;
+    padding: 2px;
+}
+.prev-alert > .title {
+    font-size: 16px;
+}
+.prev-alert > .subtitle {
+    color: #333;
+}
+.prev-alert > button {
+    float: right;
+    display: inline-block;
+    padding: 0;
+    font-size: 0.9em;
+}
+.prev-alert > .time {
+    float: right;
+    clear: right;
+    display: inline-block;
+}

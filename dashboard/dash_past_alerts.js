@@ -19,8 +19,10 @@
             var alert = newval[i];
             x += '<div class="prev-alert" data-index="'+i+'">';
             x += '<button type="button" class="btn-repeat-alert" data-index="'+i+'">Repeat</button>';
+            x += '<div class="time">'+timeSince(alert.time)+'</div>';
             x += '<div class="title">'+alert.title+'</div>';
             if(alert.subtitle) x += '<div class="subtitle">'+alert.subtitle+'</div>';
+            x += '<div class="clear"></div>';
             x += '</div>';
         }
         prevAlertContainer.innerHTML = x;

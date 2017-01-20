@@ -20,7 +20,7 @@
         },
         "graphics": [
             {
-                "file": "gfx_alerts.html",
+                "file": "gfx_all.html",
                 "width": 1920,
                 "height": 1080
             }
@@ -29,11 +29,11 @@
         ],
         "dashboardPanels": [
             {
-                "name": "yw-twitch-status",
-                "title": "Twitch Status",
+                "name": "yw-twitch",
+                "title": "Twitch",
                 "width": 2,
                 "headerColor": "#6441A4",
-                "file": "dash_twitch_status.html"
+                "file": "dash_twitch.html"
             },
             {
                 "name": "yw-youtube",

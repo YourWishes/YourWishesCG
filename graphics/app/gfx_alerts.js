@@ -1,60 +1,61 @@
 (function () {
     'use strict';
-    let nextAlertID = 0;
+    
     let alertQueue = [];
-    let currentAlert = undefined;
+    let currentAlert = null;
+        
+    let TransitionInTime = 750;
+    let TransitionOutTime = 750;
+    let borderSize = 8;
     
     nodecg.listenFor('ywShowAlert', function(value) {
         var obj = value;
-        obj.id = nextAlertID++;
-        
         alertQueue.push(obj);
     });
     
-    setInterval(() => {
-        //Check the queue
-        if(alertQueue.length < 1) return;//No point running.
-        if(typeof currentAlert != typeof undefined) return;//There's an alert already present.
+    let alertTask = setInterval(function() {
+        //First we need to check and see if we even need to do alerts
+        if(alertQueue.length < 1) return;
+        if(currentAlert) return;
         
-        var alert = alertQueue[0];//Pull the top of the queue
-        alertQueue.splice(0, 1);//Remove the top of the queue
-        currentAlert = alert;//Self Explanitory
+        let alert = alertQueue[0];
+        alertQueue.splice(0, 1);
+        currentAlert = alert;
         
         //Now we can build our alert.
-        var container = document.getElementsByClassName("alert-container")[0];
+        let container = document.getElementsByClassName("alert-container")[0];
         
-        //Check the styles.
-        var width = 550;
-        var height = 80;
-        var life = 4000;
+        let alertWidth = alert.width+borderSize;
+        let alertHeight = alert.height+borderSize;
         
-        if(alert.life) life = alert.life;
+        let alertBox = document.createElement("div");
+        alertBox.id = "alert-"+alert.id;
+        alertBox.setAttribute("data-id", alert.id);
+        alertBox.addClass("alert-box");
+        if(alert.extraClasses) {
+            for(var i = 0; i < alert.extraClasses.length; i++) {
+                alertBox.addClass(alert.extraClasses[i]);
+            }
+        }
+        alertBox.style.width = alertWidth+"px";
+        alertBox.style.height = alertHeight+"px"
         
-        var boxPos = "left: 8px;bottom: 8px;";
-        var alertWidth = width+(4*2);
-        var alertHeight = height+(4*2);
+        if(alert.position.left) alertBox.style.left = alert.position.left;
+        if(alert.position.right) alertBox.style.right = alert.position.right;
+        if(alert.position.top) alertBox.style.top = alert.position.top;
+        if(alert.position.bottom) alertBox.style.bottom = alert.position.bottom;
         
-        var title = alert.title;
-        //I'm parsing this cuz the font I use doesn't have symbols...
-        title = title.replace(/[^\w\s]/g,'');
-        title = title.replaceAll(' ', '&nbsp;&nbsp;&nbsp;&nbsp;');//My font had a weird spacing thing going on.
         
-        var x = '<div class="alert-box" style="'+boxPos+';width:'+alertWidth+'px;height:'+alertHeight+'px;" id="alert-box-'+alert.id+'">';
-        x += '<div class="alert-box-inner">';
+        let x = '<div class="alert-box-inner">';
         
         x += '<div class="alert-box-scroller"></div>';
         x += '<div class="alert-box-border left"></div>';
         x += '<div class="alert-box-border bottom"></div>';
         x += '<div class="alert-box-border right"></div>';
         x += '<div class="alert-box-border top"></div>';
-        x += '<div class="alert-box-body" style="width:'+width+'px;height:'+height+'px;">';
-        if(alert.image) x += '<div class="alert-image"><img src="'+alert.image+'" /></div>';
-        x += '<div class="alert-title">';
-        x += '<div class="title">'+title+'</div>';
-        if(alert.subtitle) x += '<div class="subtitle">'+alert.subtitle+'</div>';
-        x += '</div>';
-        x += '</div>';
         
+        x += '<div class="alert-box-body" style="width:'+alert.width+'px;height:'+alert.height+'px;">';
+        x += alert.html;
         x += '</div>';
         
         if(alert.sound && (!getQueryVariable("sound") || getQueryVariable("sound") != "false")) {
@@ -71,8 +72,9 @@
         }
         
         x += '</div>';
+        alertBox.innerHTML = x;
         
-        container.innerHTML = x;
+        container.appendChild(alertBox);
         
         if(alert.volume) {
             let alertSoundElement = document.getElementById("alert-sound-"+alert.id);
@@ -81,128 +83,17 @@
             }
         }
         
-        //Now we need to set the "Hide the alert" timer
         setTimeout(function() {
             //Get the currently queued item
-            let alertElement = document.getElementById("alert-box-"+currentAlert.id);
+            let alertElement = document.getElementById("alert-"+currentAlert.id);
             alertElement.addClass("hidden");//Hides it
             
             //Now another timeout (This is to say "Yes the queue is clear")
             setTimeout(function() {
+                let alertElement = document.getElementById("alert-"+currentAlert.id);
+                alertElement.remove();//Cleanup
                 currentAlert = undefined;
-            }, 750);
-        }, life);
+            }, TransitionOutTime);
+        }, alert.life+TransitionInTime);
     }, 200);
-    
-    
-    
-    /*
-     * Song Stuff
-     */
-    
-    //Replicants
-    const songQueue = nodecg.Replicant('yw_song_queue');
-    const nowPlaying = nodecg.Replicant('yw_now_playing');
-    const playingState = nodecg.Replicant('yw_playing_state');
-    const playingPosition = nodecg.Replicant('yw_playing_position');
-    const songVolume = nodecg.Replicant('yw_song_volume');
-    
-    //Elements
-    let songContainer = document.getElementById("song-container");
-    
-    //Functions
-    let stopCurrentSong = function() {
-        songContainer.innerHTML = '';//Not pretty, but seems to work on OBS Studio, so it's good enough for me.
-    };
-    
-    let loadSong = function(songData) {
-        stopCurrentSong();
-        if(!songData || !songData.file) return;
-        console.log("Loading " + songData.name);
-        
-        var ext = 'audio/';
-        if(songData.file.endsWith(".mp3")) {
-            ext += 'mp3';
-        } else if(songData.file.endsWith(".wav")) {
-            ext += 'wav';
-        } else if(songData.file.endsWith(".ogg")) {
-            ext += 'ogg';
-        }
-        songContainer.innerHTML = '<audio id="song-audio"><source id="song-source" src="'+songData.file+'" type="'+ext+'"></audio>';
-        getSongAudio().addEventListener('ended', function() {
-            nextSong();
-        });
-        getSongAudio().addEventListener('timeupdate', function() {
-            let x = parseInt(this.currentTime)%3;
-            if(x > 0) return;
-            if(playingPosition.value && parseInt(playingPosition.value) == parseInt(this.currentTime)) return;
-            playingPosition.value = this.currentTime;
-        });
-    };
-    
-    let getSongAudio = function() {return document.getElementById("song-audio");}
-    let getSongSource = function() {return document.getElementById("song-source");}
-    let doesCurrentSongExist = function() {return getSongAudio() ? true : false;}
-    let getPlayingState = function() {return (playingState && playingState.value && playingState.value == "PLAY") ? true : false;}
-    
-    let nextSong = function() {
-        stopCurrentSong();
-        if(!songQueue || !songQueue.value || !songQueue.value.length) {
-            nowPlaying.value = undefined;
-            return;
-        }
-        let song = songQueue.value[0];
-        let arr = songQueue.value;
-        arr.splice(0, 1);
-        songQueue.value = arr;
-        nowPlaying.value = song;
-    }
-    
-    let playCurrentSong = function() {
-        if(!doesCurrentSongExist()) return;
-        let el = getSongAudio();
-        el.play();
-        if(songVolume && songVolume.value) {
-            el.volume = songVolume.value;
-        }
-    };
-    
-    let pauseCurrentSong = function() {
-        if(!doesCurrentSongExist()) return;
-        let el = getSongAudio();
-        el.pause();
-    }
-    
-    //Repl Events
-    nowPlaying.on('change', function(newval) {
-        if(!newval || !newval.file) {
-            stopCurrentSong();
-        } else {
-            if(getSongSource() && getSongSource().src == newval.file) {
-                playCurrentSong();                
-            } else {
-                loadSong(newval);
-                if(getPlayingState()) playCurrentSong();
-            }
-        }
-    });
-    
-    songQueue.on('change', function(newval) {
-        if(!nowPlaying.value && songQueue.value && songQueue.value.length > 0) nextSong();
-    });
-    
-    playingState.on('change', function(newval) {
-        if(getPlayingState()) {
-            playCurrentSong();
-        } else {
-            pauseCurrentSong();
-        }
-    });
-    
-    songVolume.on('change', function(newval) {
-        if(!newval) return;
-        if(!doesCurrentSongExist()) return;
-        let el = getSongAudio();
-        el.volume = newval;
-    });
 })();

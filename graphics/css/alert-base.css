@@ -1,0 +1,146 @@
+* {box-sizing: border-box;font-family: "5x5 Pixel";font-size: 36px;}
+body {margin: 0;}
+
+.alert-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+.alert-box {
+    position: absolute;
+    transition: all 0.5s;
+    transition-timing-function: cubic-bezier(0.860, 0.000, 0.070, 1.000);
+    transform: translateX(0%);
+}
+
+.alert-box-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    perspective: 350px;
+}
+
+/* When adjusting the alert-box-scroller width/height and animation-duration be sure to update the borders */
+
+.alert-box-scroller {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: orange;
+    animation-name: alert-box-scroller-anim;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+    animation-timing-function: cubic-bezier(0.860, 0.000, 0.070, 1.000);
+    animation-fill-mode: forwards;
+    z-index: 10;
+}
+
+.alert-box-border {
+    background: #5282C3;
+    position: absolute;
+    z-index: 5;
+    animation-duration: 0.25s;
+    animation-iteration-count: 1;
+    animation-timing-function: cubic-bezier(0.860, 0.000, 0.070, 1.000);
+    animation-fill-mode: forwards;
+}
+
+@keyframes alert-box-border-height-anim {from {height: 0%;width: 4px;} to {height: 100%;width: 4px;}}
+@keyframes alert-box-border-width-anim {from {width: 0%;height: 4px;} to {width: 100%;height: 4px;}}
+
+.alert-box-border.left {left: 0; top: 0; animation-name: alert-box-border-height-anim;}
+.alert-box-border.bottom {left: 0; bottom: 0; animation-name: alert-box-border-width-anim;animation-delay: 0.25s;}
+.alert-box-border.right {right: 0; bottom: 0; animation-name: alert-box-border-height-anim; animation-delay: 0.5s;}
+.alert-box-border.top {right: 0; top: 0; animation-name: alert-box-border-width-anim;animation-delay: 0.75s;}
+
+
+.alert-image {
+    display: inline-block;
+    height: 100%;
+    position: relative;
+    padding: 8px;
+}
+.alert-image > img {max-height: 100%;display:block;}
+
+.alert-title {
+    position: absolute;
+    padding: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 35px;
+}
+.alert-title.no-image {left: 16px;}
+.alert-title.has-image {left: 96px;}
+
+.alert-title > .title {
+    line-height: 0.9em;
+}
+.alert-title > .subtitle {
+    line-height: 0.9em;
+    font-size: 18px;
+    font-family: pixelmix;
+}
+
+.alert-inner-body {
+    font-size: 28px;
+    padding: 4px;
+}
+
+.alert-box-body {
+    position: absolute;
+    background: url('../images/alert-bg.png');
+    left: 50%;
+    top: 4px;
+    animation-name: alert-box-body;
+    animation-duration: 0.75s;
+    animation-iteration-count: 1;
+    animation-timing-function: cubic-bezier(0.860, 0.000, 0.070, 1.000);
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+    transform: rotateX(90deg);
+    z-index: 0;
+    opacity: 0;
+    color: white;
+}
+.alert-box.hidden {left: 0;transform:translateX(-150%);}
+.alert-box.follower-alert.hidden {top: 0; transform:translateY(-150%);}
+
+@keyframes alert-box-body {
+    0% {transform: rotateX(90deg) translateX(-50%);opacity: 100;}
+    100% {transform: rotateX(0deg)  translateX(-50%);opacity: 100;animation-play-state: paused;}
+}
+
+@keyframes alert-box-scroller-anim {
+    0% {
+        top: 0%;
+        left: 0%;
+        transform: translate(0, 0);
+    }
+    
+    25% {
+        top: 100%;
+        left: 0%;
+        transform: translate(0, -100%);
+    }
+    
+    50% {
+        top: 100%;
+        left: 100%;
+        transform: translate(-100%, -100%);
+    }
+    
+    75% {
+        top: 0%;
+        left: 100%;
+        transform: translate(-100%, 0);
+    }
+    99% {background: orange;}
+    100% {
+        background: orange;
+        top: 0%;
+        left: 0%;
+        transform: translate(0, 0);
+    }
+}

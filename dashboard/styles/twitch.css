@@ -1,0 +1,16 @@
+.bot-list {
+    
+}
+
+.bot-list > .bot {
+    clear: both;
+    margin: 4px;
+}
+
+.bot-list > .bot > .status {
+    float: right;
+}
+.bot-list > .bot > .status.status-offline {color: red;}
+.bot-list > .bot > .status.status-online {color: green;}
+.bot-list > .bot > .status.status-pending {color: #666;}
+.bot-list > .bot > .status > a {color: inherit; text-decoration: none;}

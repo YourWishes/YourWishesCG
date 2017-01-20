@@ -3,12 +3,14 @@
 const ytdl = require('ytdl-core');
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
+const Alert = require('../alerts/Alert.js');
+const SimpleAlert = require('../alerts/SimpleAlert.js');
+const utils = require('../utils/index.js');
+
+const SONGS_DIRECTORY = './bundles/yourwishescg/graphics/songs'
 
 module.exports = function (nodecg,app) {
-    if(!fs.existsSync('./bundles/')) fs.mkdirSync('./bundles/');
-    if(!fs.existsSync('./bundles/yourwishescg/')) fs.mkdirSync('./bundles/yourwishescg/');
-    if(!fs.existsSync('./bundles/yourwishescg/graphics/')) fs.mkdirSync('./bundles/yourwishescg/graphics/');
-    if(!fs.existsSync('./bundles/yourwishescg/graphics/songs/')) fs.mkdirSync('./bundles/yourwishescg/graphics/songs/');
+    utils.mkdirsSync(SONGS_DIRECTORY);
     
     //Replicants
     const songQueue = nodecg.Replicant('yw_song_queue', {defaultValue: [], persistant: true});
@@ -21,13 +23,37 @@ module.exports = function (nodecg,app) {
     //Functions
     let alertSong = function(song) {
         if(!song || !song.name) return;
-        let obj = {
-            title: song.name,
-            image: "images/music_animated.gif",
-            life: 5000
-        };
-        if(song.artist) obj.subtitle = song.artist;
-        nodecg.sendMessage('ywShowAlert', obj);
+        let obj = {};
+        
+        if(nodecg && nodecg.bundleConfig && nodecg.bundleConfig && nodecg.bundleConfig.music && nodecg.bundleConfig.music.alerts && nodecg.bundleConfig.music.alerts.play) {
+            obj = utils.cloneObject(nodecg.bundleConfig.music.alerts.play);
+            
+            //First chose our messages
+            if(song.artist) {
+                if(obj.titleArtist) obj.title = obj.titleArtist;
+                if(obj.subtitleArtist) obj.subtitle = obj.subtitleArtist;
+            } else {
+                if(obj.titleNoArtist) obj.title = obj.titleNoArtist;
+                if(obj.subtitleNoArtist) obj.subtitle = obj.subtitleNoArtist;
+            }
+            
+            //Now format
+            if(obj.title) obj.title = obj.title.replaceAll("{song}", song.name);
+            if(obj.subtitle) obj.subtitle = obj.subtitle.replaceAll("{song}", song.name);
+            if(obj.html) obj.html = obj.html.replaceAll("{song}", song.name);
+            
+            if(song.artist) {
+                if(obj.title) obj.title = obj.title.replaceAll("{artist}", song.artist);
+                if(obj.subtitle) obj.subtitle = obj.subtitle.replaceAll("{artist}", song.artist);
+                if(obj.html) obj.html = obj.html.replaceAll("{artist}", song.artist);
+            }
+        }
+        obj.type = "Song";
+        obj.typeData = song;
+        
+        let alert = new SimpleAlert(obj);
+        alert.queue();
+        return alert;
     }
     
     let refreshPreloadedSongs = function() {
@@ -59,10 +85,10 @@ module.exports = function (nodecg,app) {
         
         let id = value.id;
         if(id.startsWith("http") || id.startsWith("www")) {
-            id = nodecg.getQueryVariable("v", value.id);
+            id = utils.getQueryVariable("v", value.id);
         }
         
-        let dir = './bundles/yourwishescg/graphics/songs/'+id+'/';
+        let dir = SONGS_DIRECTORY+"/"+id+'/';
         if(!fs.existsSync(dir)) fs.mkdirSync(dir);
         
         
